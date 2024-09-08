@@ -1,48 +1,31 @@
 const { ethers } = require("ethers");
 const { getDomain } = require("../helpers/eip712");
 
-const getBadgeData = async (contract, badgeName) => {
-    const badgeNameHash = await contract.hashBadgeName(badgeName);
-    const tokenId = await contract.getTokenId(badgeNameHash);
-    return {
-        badgeNameHash,
-        tokenId,
-    };
-};
-
 const buildTypedData = async (contract, data) => {
     const domain = await getDomain(contract);
-    const { badgeNameHash, tokenId } = await getBadgeData(
-        contract,
-        data.badgeName,
-    );
+    const tokenId = await contract.getPointId(data.badgeName);
     return {
         types: {
-            MintBadgeData: [
+            MintPointData: [
                 {
                     name: "to",
                     type: "address",
-                },
-                {
-                    name: "badgeId",
-                    type: "uint256",
                 },
                 {
                     name: "tokenId",
                     type: "uint256",
                 },
                 {
-                    name: "badgeNameHash",
-                    type: "bytes32",
+                    name: "amount",
+                    type: "uint256",
                 },
             ],
         },
         domain,
         message: {
             to: data.to,
-            badgeId: data.badgeId,
-            tokenId,
-            badgeNameHash,
+            tokenId: tokenId,
+            amount: data.point,
         },
     };
 };
@@ -52,7 +35,7 @@ async function _signData(signer, data) {
     // console.log("signing", data);
     if (typeof signer === "string") {
         const signerWallet = new ethers.Wallet(signer);
-        // console.log("signer", data.message);
+        console.log("signer", data);
         signature = await signerWallet.signTypedData(
             data.domain,
             data.types,
@@ -77,14 +60,24 @@ async function _signData(signer, data) {
 const signData = async (signer, badgeContact, data) => {
     const dataSign = await buildTypedData(badgeContact, data);
     const signatureResultEthers = await _signData(signer, dataSign);
-
+    // console.log("signatureResultEthers", {
+    //     to: data.to,
+    //     tokenId: dataSign.message.tokenId,
+    //     amount: dataSign.message.amount,
+    //     badgeType: data.badgeType,
+    //     badgeName: data.badgeName,
+    //     signature: signatureResultEthers,
+    // });
     return {
-        ...dataSign.message,
+        to: data.to,
+        tokenId: dataSign.message.tokenId,
+        badgeName: data.badgeName,
+        badgeType: data.badgeType,
+        amount: dataSign.message.amount,
         signature: signatureResultEthers,
     };
 };
 
 module.exports = {
     signData,
-    getBadgeData,
 };

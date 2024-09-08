@@ -21,7 +21,7 @@ contract BadgeV1 is
 
     bytes32 internal constant _MINT_DATA_TYPEHASH =
         keccak256(
-            "MintBadgeData(address adminWallet,address to,uint256 badgeId,uint256 tokenId,bytes32 badgeNameHash)"
+            "MintBadgeData(address to,uint256 badgeId,uint256 tokenId,bytes32 badgeNameHash)"
         );
 
     /** Role definintions */
@@ -31,7 +31,6 @@ contract BadgeV1 is
 
     /** Datatypes */
     struct MintBadgeData {
-        address adminWallet;
         address to;
         uint256 badgeId;
         uint256 tokenId;
@@ -111,14 +110,14 @@ contract BadgeV1 is
         (
             bool signerMatch,
             address signer,
-            address addminAddress,
+            address verifyAddress,
             uint256 tokenId
         ) = _validate(mintData);
         if (tokenId != mintData.tokenId || tokenId == 0) {
             revert InvalidTokenId(tokenId, mintData.tokenId);
         }
         if (!signerMatch) {
-            revert InvalidSigner(signer, addminAddress);
+            revert InvalidSigner(signer, verifyAddress);
         }
         addMinted(mintData.badgeId, mintData.tokenId);
         _mint(mintData.to, mintData.tokenId, 1, "");
@@ -187,14 +186,18 @@ contract BadgeV1 is
 
     function hashBadgeName(
         string calldata badgeName
-    ) public view returns (bytes32) {
-        return keccak256(abi.encodePacked(badgeName, address(this)));
+    ) public pure returns (bytes32) {
+        return bytes32(stringToBytes(badgeName, 32));
     }
 
     function _genTokenId(
         string calldata badgeName
     ) internal view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(badgeName, address(this))));
+        bytes memory nameHash12Bytes = stringToBytes(badgeName, 12);
+        return
+            uint256(
+                bytes32(bytes.concat(nameHash12Bytes, bytes20(address(this))))
+            );
     }
 
     function getVerifyAddress() internal view returns (address) {
@@ -210,19 +213,19 @@ contract BadgeV1 is
         returns (
             bool signerMatch,
             address signer,
-            address addminAddress,
+            address verifyAddress,
             uint256 tokenId
         )
     {
         BadgeStorage storage $ = _getBadgeStorage();
         uint256 _tokenId = $.tokenIds[mintData.badgeNameHash];
-        address _addminAddress = getVerifyAddress();
+        address _verifyAddress = getVerifyAddress();
         address recovered = _recoverSigner(mintData);
 
         return (
-            recovered == _addminAddress,
+            recovered == _verifyAddress,
             recovered,
-            _addminAddress,
+            _verifyAddress,
             _tokenId
         );
     }
@@ -234,7 +237,6 @@ contract BadgeV1 is
             keccak256(
                 abi.encode(
                     _MINT_DATA_TYPEHASH,
-                    mintData.adminWallet,
                     mintData.to,
                     mintData.badgeId,
                     mintData.tokenId,
@@ -272,5 +274,44 @@ contract BadgeV1 is
         whenNotPaused
     {
         super._update(from, to, ids, values);
+    }
+
+    function stringToBytes(
+        string memory input,
+        uint256 length
+    ) public pure returns (bytes memory) {
+        bytes memory inputBytes = bytes(input);
+        bytes memory result = new bytes(length);
+        uint256 minLength = inputBytes.length < length
+            ? inputBytes.length
+            : length;
+
+        // Copy only the necessary bytes
+        for (uint256 i = 0; i < minLength; i++) {
+            result[i] = inputBytes[i];
+        }
+
+        return result;
+    }
+
+    // not tranferable
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public virtual override {
+        revert("Transfers are disabled for this token.");
+    }
+
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public virtual override {
+        revert("Batch transfers are disabled for this token.");
     }
 }

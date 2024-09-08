@@ -274,4 +274,25 @@ contract BadgeV2 is
     {
         super._update(from, to, ids, values);
     }
+
+    // not tranferable
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public virtual override {
+        revert("Transfers are disabled for this token.");
+    }
+
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public virtual override {
+        revert("Batch transfers are disabled for this token.");
+    }
 }

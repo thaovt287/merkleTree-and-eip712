@@ -6,34 +6,41 @@ const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { log } = require("console");
 const { init } = require("./fixture.V2");
-const pointDemoes = require("./pointDemoes.json")
-const { getTokenIdBadge, genRootMerkleTree, genProof} = require("../scripts/claimBadge/merkleTree");
+const pointDemoes = require("./pointDemoes.json");
+const {
+    getTokenIdBadge,
+    genRootMerkleTree,
+    genProof,
+} = require("../scripts/claimBadge/merkleTree");
 
 describe("Swap contract", () => {
     let badgeContract,
         contractAdmin,
         badgeSetter,
-        rootSetter,
+        verifyAddress,
+        verifyAddressSetter,
         addrs,
         badgeProxyAddress;
     const badgeNames = [
-        "ARC Crew", "Connector", "Champion", "Connoisseur", "Co-creator",
-        "Champion+", "Connector+", "Connoisseur+", "Co-creator+"
+        "ARC Crew",
+        "Connector",
+        "Champion",
+        "Connoisseur",
+        "Co-creator",
+        "Champion+",
+        "Connector+",
+        "Connoisseur+",
+        "Co-creator+",
     ];
-    const eligiblePoins = [10, 20, 2, 30, 5, 20, 30, 12, 20 ];
-    let pointDatas = []
-    let tokenIds = {}
-    let mintDatas
+    const eligiblePoins = [10, 20, 2, 30, 5, 20, 30, 12, 20];
+    let pointDatas = [];
+    let tokenIds = {};
+    let mintDatas;
 
     async function deployContracts() {
-        const {
-            accounts,
-            badgeProxyAddress,
-            badgeContract,
-        } = await init();
+        const { accounts, badgeProxyAddress, badgeContract } = await init();
 
-        [contractAdmin, rootSetter, badgeSetter, ...addrs] =
-            accounts;
+        [contractAdmin, rootSetter, badgeSetter, ...addrs] = accounts;
 
         return {
             badgeProxyAddress,
@@ -60,8 +67,10 @@ describe("Swap contract", () => {
         );
 
         // set badges and eligible points
-        await badgeContract.connect(badgeSetter).setBadges(badgeNames,eligiblePoins )
-        await badgeContract.connect(badgeSetter).setBadge("Connoisseur", 20)
+        await badgeContract
+            .connect(badgeSetter)
+            .setBadges(badgeNames, eligiblePoins);
+        await badgeContract.connect(badgeSetter).setBadge("Connoisseur", 20);
 
         // grant ROOT_SETTER role to rootSetter
         await badgeContract.grantRole(
@@ -69,29 +78,27 @@ describe("Swap contract", () => {
             rootSetter.address,
         );
         const _tokenIds = await badgeContract.getTokenIds();
-            
+
         for (const tokenId of _tokenIds) {
-            // console.log("tokenId", tokenId); 
-            tokenIds[tokenId[0]] = tokenId[1]
+            // console.log("tokenId", tokenId);
+            tokenIds[tokenId[0]] = tokenId[1];
         }
         // console.log(tokenIds)
-        mintDatas = pointDemoes.map(data => {
-            
-            pointDatas.push([data.to, tokenIds[data.nameBadge], data.point])
+        mintDatas = pointDemoes.map((data) => {
+            pointDatas.push([data.to, tokenIds[data.nameBadge], data.point]);
             return {
                 to: data.to,
                 tokenId: tokenIds[data.nameBadge],
                 point: data.point,
-            }
+            };
         });
         // console.log("pointDatas", pointDatas);
-        const root = genRootMerkleTree(pointDatas)
-        await badgeContract.connect(rootSetter).setMerkleRoot(root)
+        const root = genRootMerkleTree(pointDatas);
+        await badgeContract.connect(rootSetter).setMerkleRoot(root);
 
         const user1 = addrs[0][0];
         const user2 = addrs[0][1];
         const user3 = addrs[0][2];
-        
 
         return {
             badgeProxyAddress,
@@ -170,7 +177,6 @@ describe("Swap contract", () => {
                 ),
             ).to.be.false;
         });
-
     });
 
     describe("Mint NFT", () => {
@@ -206,14 +212,17 @@ describe("Swap contract", () => {
             // console.log("badgeNameFromContract", badgeNameFromContract);
             const mintData = mintDatas[0];
             delete mintData.nameBadge;
-            mintData.merkleProof = genProof(pointDatas,mintData.to, mintData.tokenId)
+            mintData.merkleProof = genProof(
+                pointDatas,
+                mintData.to,
+                mintData.tokenId,
+            );
             await badgeContract
-            .connect(user2)
-            .mint(mintData)
-            .then((tx) => {
-                tx.wait();
-            });
-
+                .connect(user2)
+                .mint(mintData)
+                .then((tx) => {
+                    tx.wait();
+                });
         });
 
         it("Mint NFTs with the same tokenId", async function () {
@@ -222,21 +231,21 @@ describe("Swap contract", () => {
             const badgeName = badgeNameFromContract[0];
             // console.log("badgeName", badgeName);
             // console.log("badgeNameFromContract", badgeNameFromContract);
-            for (let i = 1; i <mintDatas.length; i++) {
+            for (let i = 1; i < mintDatas.length; i++) {
                 const mintData = mintDatas[i];
                 delete mintData.nameBadge;
-                mintData.merkleProof = genProof(pointDatas,mintData.to, mintData.tokenId)
+                mintData.merkleProof = genProof(
+                    pointDatas,
+                    mintData.to,
+                    mintData.tokenId,
+                );
                 await badgeContract
-                .connect(user2)
-                .mint(mintData)
-                .then((tx) => {
-                    tx.wait();
-                });
+                    .connect(user2)
+                    .mint(mintData)
+                    .then((tx) => {
+                        tx.wait();
+                    });
             }
-
-
         });
     });
-
-
-})
+});
