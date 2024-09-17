@@ -44,7 +44,7 @@
 | Solidity: runs      | 200             |
 | Solidity: viaIR     | false           |
 | Block Limit         | 30,000,000      |
-| L1 Gas Price        | 0.01000 gwei    |
+| L2 Gas Price        | 0.01000 gwei    |
 | Token Price         | 2284.43 usd/eth |
 | Network             | ETHEREUM        |
 | Toolchain           | hardhat         |
