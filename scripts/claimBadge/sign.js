@@ -1,21 +1,21 @@
 const { ethers } = require("ethers");
 const { getDomain } = require("../helpers/eip712");
+const { stringToBytes, firstBytes } = require("../utils/encodingHelper");
 
-const getBadgeData = async (contract, badgeName) => {
-    const badgeNameHash = await contract.hashBadgeName(badgeName);
-    const tokenId = await contract.getTokenId(badgeNameHash);
-    return {
-        badgeNameHash,
-        tokenId,
-    };
+const genTokenId = (contractAddress, badgeName) => {
+    const badgeHash12Bytes = stringToBytes(badgeName, 12);
+
+    //Concatenate the 12-byte name hash and the 20-byte contract address
+    const tokenIdHex = badgeHash12Bytes + firstBytes(contractAddress, 20);
+    // console.log("genTokenId", tokenIdHex, tokenIdHex.length);
+    // Convert to a BigNumber
+    return BigInt(tokenIdHex);
 };
 
 const buildTypedData = async (contract, data) => {
     const domain = await getDomain(contract);
-    const { badgeNameHash, tokenId } = await getBadgeData(
-        contract,
-        data.badgeName,
-    );
+    const tokenId = genTokenId(contract.target, data.badgeName);
+
     return {
         types: {
             MintBadgeData: [
@@ -31,10 +31,6 @@ const buildTypedData = async (contract, data) => {
                     name: "tokenId",
                     type: "uint256",
                 },
-                {
-                    name: "badgeNameHash",
-                    type: "bytes32",
-                },
             ],
         },
         domain,
@@ -42,7 +38,6 @@ const buildTypedData = async (contract, data) => {
             to: data.to,
             badgeId: data.badgeId,
             tokenId,
-            badgeNameHash,
         },
     };
 };
@@ -86,5 +81,5 @@ const signData = async (signer, badgeContact, data) => {
 
 module.exports = {
     signData,
-    getBadgeData,
+    genTokenId,
 };

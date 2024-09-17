@@ -32,7 +32,6 @@ contract BadgeV2 is
     /** Storage */
     /// @custom:storage-location erc7201:BadgeV2.storage.BadgeStorage
     struct BadgeStorage {
-        string[] badgeNames;
         //TokenId - eligiblePoint
         mapping(uint256 => uint256) eligiblePoints;
         bytes32 merkleRoot;
@@ -59,8 +58,7 @@ contract BadgeV2 is
     );
     event BadgeSet(
         address indexed caller,
-        string badgeName,
-        uint256 tokenId,
+        uint256 badgeId,
         uint256 eligiblePoint,
         uint256 timestamp
     );
@@ -73,10 +71,10 @@ contract BadgeV2 is
     error BadgeMinted(address to, uint256 tokenId);
     error EmptyList();
     error InvalidMintData(MintBadgeData mintData);
-    error NotSetBadge(uint256 tokenId);
+    error NotsetEligiblePointBadge(uint256 tokenId);
     error NotEnoughPoint(address to, uint256 point, uint256 eligiblePoint);
-    error InvalidSetBadgeList(
-        uint256 badgeNamesLength,
+    error InvalidsetEligiblePointBadgeList(
+        uint256 badgeIdsLength,
         uint256 eligiblePoinsLength
     );
 
@@ -100,7 +98,7 @@ contract BadgeV2 is
             revert InvalidMintData(mintData);
         }
         if (eligiblePoint <= 0) {
-            revert NotSetBadge(mintData.tokenId);
+            revert NotsetEligiblePointBadge(mintData.tokenId);
         }
         if (!isEnoughPoint) {
             revert NotEnoughPoint(mintData.to, mintData.point, eligiblePoint);
@@ -123,84 +121,40 @@ contract BadgeV2 is
         }
         _getBadgeStorage().merkleRoot = rootHash;
     }
-    //-------------- setBadge --------------
+    //-------------- setEligiblePointBadge --------------
 
-    function setBadge(
-        string calldata badgeName,
+    function setEligiblePointBadge(
+        uint256 badgeId,
         uint256 eligiblePoint
     ) external onlyRole(BADGE_SETTER) {
-        _setBadge(badgeName, eligiblePoint);
+        _setEligiblePointBadge(badgeId, eligiblePoint);
     }
-    function setBadges(
-        string[] calldata badgeNames,
+    function setEligiblePointBadges(
+        uint256[] calldata badgeId,
         uint256[] calldata eligiblePoins
     ) external onlyRole(BADGE_SETTER) {
-        if (
-            badgeNames.length == 0 || badgeNames.length != eligiblePoins.length
-        ) {
-            revert InvalidSetBadgeList(badgeNames.length, eligiblePoins.length);
+        if (badgeId.length == 0 || badgeId.length != eligiblePoins.length) {
+            revert InvalidsetEligiblePointBadgeList(
+                badgeId.length,
+                eligiblePoins.length
+            );
         }
-        for (uint256 i = 0; i < badgeNames.length; i++) {
-            _setBadge(badgeNames[i], eligiblePoins[i]);
+        for (uint256 i = 0; i < badgeId.length; i++) {
+            _setEligiblePointBadge(badgeId[i], eligiblePoins[i]);
         }
     }
-    function _setBadge(
-        string calldata badgeName,
+    function _setEligiblePointBadge(
+        uint256 badgeId,
         uint256 eligiblePoint
     ) internal {
-        uint256 tokenId = _genTokenId(badgeName);
-        // bytes32 _badgeNameHash = hashBadgeName(badgeName);
         BadgeStorage storage $ = _getBadgeStorage();
-        $.eligiblePoints[tokenId] = eligiblePoint;
-        $.badgeNames.push(badgeName);
-        emit BadgeSet(
-            _msgSender(),
-            badgeName,
-            tokenId,
-            eligiblePoint,
-            block.timestamp
-        );
+        $.eligiblePoints[badgeId] = eligiblePoint;
+        emit BadgeSet(_msgSender(), badgeId, eligiblePoint, block.timestamp);
     }
 
-    function getBadgeNames() public view returns (string[] memory badgeNames) {
-        return _getBadgeStorage().badgeNames;
-    }
-
-    function getTokenId(
-        string memory badgeName
-    ) external view returns (uint256) {
-        return _genTokenId(badgeName);
-    }
-
-    function getTokenIds() external view returns (BadgeToken[] memory) {
-        string[] memory badgeNames = getBadgeNames();
-        BadgeToken[] memory tokenIds = new BadgeToken[](badgeNames.length);
-
-        for (uint256 i = 0; i < badgeNames.length; i++) {
-            tokenIds[i] = BadgeToken(badgeNames[i], _genTokenId(badgeNames[i]));
-        }
-
-        return tokenIds;
-    }
-
-    function getEligiblePoint(
-        string calldata badgeName
-    ) public view returns (uint256) {
-        uint256 tokenId = _genTokenId(badgeName);
+    function getEligiblePoint(uint256 badgeId) public view returns (uint256) {
         BadgeStorage storage $ = _getBadgeStorage();
-        return $.eligiblePoints[tokenId];
-    }
-
-    // function hashBadgeName(
-    //     string calldata badgeName
-    // ) public view returns (bytes32) {
-    //     return keccak256(abi.encodePacked(badgeName, address(this)));
-    // }
-
-    function _genTokenId(
-        string memory badgeName
-    ) internal view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(badgeName, address(this))));
+        return $.eligiblePoints[badgeId];
     }
 
     function _validate(

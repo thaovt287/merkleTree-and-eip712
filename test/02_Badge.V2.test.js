@@ -7,10 +7,11 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { log } = require("console");
 const { init } = require("./fixture.V2");
 const pointDemoes = require("./pointDemoes.json");
+const { genTokenId } = require("../scripts/claimBadge/sign");
 const {
-    getTokenIdBadge,
     genRootMerkleTree,
     genProof,
+    verifyMerkleTree,
 } = require("../scripts/claimBadge/merkleTree");
 
 describe("Swap contract", () => {
@@ -36,6 +37,7 @@ describe("Swap contract", () => {
     let pointDatas = [];
     let tokenIds = {};
     let mintDatas;
+    let merkleRoot;
 
     async function deployContracts() {
         const { accounts, badgeProxyAddress, badgeContract } = await init();
@@ -67,34 +69,40 @@ describe("Swap contract", () => {
         );
 
         // set badges and eligible points
+        const badgeIds = [];
+        for (let index = 0; index < badgeNames.length; index++) {
+            // console.log(badgeNames[index]);
+            badgeIds.push(genTokenId(badgeProxyAddress, badgeNames[index]));
+        }
         await badgeContract
             .connect(badgeSetter)
-            .setBadges(badgeNames, eligiblePoins);
-        await badgeContract.connect(badgeSetter).setBadge("Connoisseur", 20);
+            .setEligiblePointBadges(badgeIds, eligiblePoins);
+
+        await badgeContract
+            .connect(badgeSetter)
+            .setEligiblePointBadge(
+                genTokenId(badgeContract.target, "Connoisseur"),
+                20,
+            );
 
         // grant ROOT_SETTER role to rootSetter
         await badgeContract.grantRole(
             await badgeContract.ROOT_SETTER(),
             rootSetter.address,
         );
-        const _tokenIds = await badgeContract.getTokenIds();
-
-        for (const tokenId of _tokenIds) {
-            // console.log("tokenId", tokenId);
-            tokenIds[tokenId[0]] = tokenId[1];
-        }
         // console.log(tokenIds)
         mintDatas = pointDemoes.map((data) => {
-            pointDatas.push([data.to, tokenIds[data.nameBadge], data.point]);
+            const tokenId = genTokenId(badgeContract.target, data.badgeName);
+            pointDatas.push([data.to, tokenId, data.point]);
             return {
                 to: data.to,
-                tokenId: tokenIds[data.nameBadge],
+                tokenId: tokenId,
                 point: data.point,
             };
         });
         // console.log("pointDatas", pointDatas);
-        const root = genRootMerkleTree(pointDatas);
-        await badgeContract.connect(rootSetter).setMerkleRoot(root);
+        merkleRoot = genRootMerkleTree(pointDatas);
+        await badgeContract.connect(rootSetter).setMerkleRoot(merkleRoot);
 
         const user1 = addrs[0][0];
         const user2 = addrs[0][1];
@@ -206,12 +214,9 @@ describe("Swap contract", () => {
 
         it("mint a NFT", async function () {
             // console.log("tokenIds");
-            const badgeNameFromContract = await badgeContract.getBadgeNames();
-            const badgeName = badgeNameFromContract[0];
-            // console.log("badgeName", badgeName);
-            // console.log("badgeNameFromContract", badgeNameFromContract);
+            const badgeName = badgeNames[0];
             const mintData = mintDatas[0];
-            delete mintData.nameBadge;
+            delete mintData.badgeName;
             mintData.merkleProof = genProof(
                 pointDatas,
                 mintData.to,
@@ -226,19 +231,28 @@ describe("Swap contract", () => {
         });
 
         it("Mint NFTs with the same tokenId", async function () {
-            // console.log("tokenIds");
-            const badgeNameFromContract = await badgeContract.getBadgeNames();
-            const badgeName = badgeNameFromContract[0];
-            // console.log("badgeName", badgeName);
-            // console.log("badgeNameFromContract", badgeNameFromContract);
+            // console.log("pointDatas", pointDatas);
             for (let i = 1; i < mintDatas.length; i++) {
                 const mintData = mintDatas[i];
-                delete mintData.nameBadge;
+                delete mintData.badgeName;
                 mintData.merkleProof = genProof(
                     pointDatas,
                     mintData.to,
                     mintData.tokenId,
                 );
+
+                // console.log(
+                //     "verifyMerkleTree",
+                //     pointDatas.length,
+                //     i,
+                //     verifyMerkleTree(
+                //         mintData.to,
+                //         mintData.tokenId,
+                //         mintData.point,
+                //         merkleRoot,
+                //         mintData.merkleProof,
+                //     ),
+                // );
                 await badgeContract
                     .connect(user2)
                     .mint(mintData)

@@ -11,6 +11,7 @@ require("hardhat-gas-reporter");
 require("hardhat-extended-tasks");
 const { Constants, CoinBase, log } = require("./scripts/utils");
 const { OZResolver } = require("hardhat-gas-reporter/dist/lib/resolvers/oz");
+const ENV_KEY = process.env.DEPLOYMENT_ENV;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     const accounts = await hre.ethers.getSigners();
@@ -60,6 +61,12 @@ module.exports = {
             accounts: [Constants.DEPLOYER_PK],
             from: Constants.DEPLOYER_ADDR,
         },
+        optimism: {
+            url: process.env["OP_PROVIDER_" + ENV_KEY],
+            chainId: ENV_KEY === "DEV" ? 11155420 : 10,
+            accounts: [Constants.DEPLOYER_PK],
+            from: Constants.DEPLOYER_ADDR,
+        },
     },
     etherscan: {
         apiKey: {
@@ -67,6 +74,8 @@ module.exports = {
             sepolia: process.env.ETHERSCAN_API_KEY,
             polygon: process.env.POLYGONSCAN_API_KEY,
             polygonAmoy: process.env.OKLINK_API_KEY,
+            base: process.env.BASESCAN_API_KEY,
+            optimism: process.env.OPSCAN_API_KEY,
         },
         customChains: [
             {
@@ -107,9 +116,14 @@ module.exports = {
         currency: "USD",
         coinmarketcap: process.env.COINMARKETCAP_API_KEY,
         enabled: process.env.REPORT_GAS ? true : false,
-        L1: "ethereum",
-        L1Etherscan: `&apiKey=${process.env.ETHERSCAN_API_KEY}`,
-        gasPrice: 3,
+        // L1: "ethereum",
+        // l2: "optimism",
+        // L1Etherscan: `${process.env.ETHERSCAN_API_KEY}`,
+        // L2Etherscan: `${process.env.OPSCAN_API_KEY}`,
+        // gasPrice: 3, //ETH
+        gasPrice: 0.001, //OPTIMISM https://dune.com/haddis3/optimism-fee-calculator 
+        // gasPrice: 0.1,  //BASE https://base.dex.guru/gastracker
+        // gasPrice: 0.01,  //ARB https://docs.arbitrum.io/how-arbitrum-works/gas-fees#:~:text=Gas%20Price%20Floor%E2%80%8B,and%200.01%20gwei%20on%20Nova).
         currencyDisplayPrecision: 5,
         includeIntrinsicGas: true,
         proxyResolver: new OZResolver(),

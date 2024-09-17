@@ -6,8 +6,16 @@ const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { log } = require("console");
 const { init } = require("./fixture.V2.2");
-const { signData, getBadgeData } = require("../scripts/claimBadge/signV2");
+const {
+    signData,
+    genPointId,
+    genBadgeId,
+} = require("../scripts/claimBadge/signV2");
 const { BlockHelper } = require("./blockHelper");
+const BADGE_TYPE = {
+    POINT: 0,
+    BADGE: 1,
+};
 
 describe("Swap contract", () => {
     let badgeContract,
@@ -68,10 +76,21 @@ describe("Swap contract", () => {
         );
 
         // set badges and eligible points
+        const badgeIds = [];
+        for (let index = 0; index < badgeNames.length; index++) {
+            // console.log(badgeNames[index]);
+            badgeIds.push(genBadgeId(badgeProxyAddress, badgeNames[index]));
+        }
         await badgeContract
             .connect(badgeSetter)
-            .setBadges(badgeNames, eligiblePoins);
-        await badgeContract.connect(badgeSetter).setBadge("Connoisseur", 12);
+            .setEligiblePointBadges(badgeIds, eligiblePoins);
+
+        await badgeContract
+            .connect(badgeSetter)
+            .setEligiblePointBadge(
+                genBadgeId(badgeProxyAddress, "Connoisseur"),
+                12,
+            );
 
         const user1 = addrs[0][0];
         const user2 = addrs[0][1];
@@ -170,9 +189,10 @@ describe("Swap contract", () => {
         });
 
         it("Should set a badge", async () => {
+            let badgeId = genBadgeId(badgeProxyAddress, badgeNames[0]);
             let badgeSetTx = await badgeContract
                 .connect(badgeSetter)
-                .setBadge("Co-creator", 12);
+                .setEligiblePointBadge(badgeId, 12);
             let badgeSetTxReceipt = await badgeSetTx.wait();
             let badgeSetTxTimestamp =
                 await BlockHelper.getBlockTimestamp(badgeSetTxReceipt);
@@ -212,8 +232,7 @@ describe("Swap contract", () => {
             user3 = _user3;
         });
         it("mint a NFT", async function () {
-            const badgeNameFromContract = await badgeContract.getBadgeNames();
-            const badgeName = badgeNameFromContract[0];
+            const badgeName = badgeNames[0];
 
             // for (let i = 0; i < 100; i++) {
             //     const mintData = await signData(signerPk, badgeContract, {
@@ -233,7 +252,7 @@ describe("Swap contract", () => {
                 to: user1.address,
                 badgeName: badgeName,
                 point: 50,
-                badgeType: 1,
+                badgeType: BADGE_TYPE.POINT,
             });
 
             await badgeContract
@@ -243,11 +262,14 @@ describe("Swap contract", () => {
                     tx.wait();
                 });
             expect(
-                await badgeContract.balanceOf(user1.address, mintData.tokenId),
+                await badgeContract.balanceOf(user1.address, mintData.pointId),
             ).to.be.deep.eq(50);
+
+            const badgeId = genBadgeId(badgeContract.target, badgeName);
             const mintBadgeData = {
                 to: user1.address,
-                badgeName: badgeName,
+                pointId: genPointId(badgeContract.target, badgeName),
+                badgeId,
             };
 
             // console.log(user2);
@@ -257,9 +279,9 @@ describe("Swap contract", () => {
                 .then((tx) => {
                     tx.wait();
                 });
-            const badgeId = await badgeContract.getBadgeId(badgeName);
+
             expect(
-                await badgeContract.balanceOf(user1.address, mintData.tokenId),
+                await badgeContract.balanceOf(user1.address, mintData.pointId),
             ).to.be.deep.eq(40);
             expect(
                 await badgeContract.balanceOf(user1.address, badgeId),

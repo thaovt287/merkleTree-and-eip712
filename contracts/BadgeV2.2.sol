@@ -19,7 +19,7 @@ contract BadgeV22 is
     using ECDSA for bytes32;
 
     bytes32 internal constant _MINT_POINT_DATA_TYPEHASH =
-        keccak256("MintPointData(address to,uint256 tokenId,unit256 amount)");
+        keccak256("MintPointData(address to,uint256 pointId,uint256 amount)");
 
     /** Role definintions */
     bytes32 public constant VERIFY_ADDRESS_SETTER =
@@ -32,25 +32,21 @@ contract BadgeV22 is
 
     struct MintPointData {
         address to;
-        uint256 tokenId;
-        string badgeName;
+        uint256 pointId;
         uint256 amount;
         bytes signature;
     }
+
     struct MintBadgeData {
         address to;
-        string badgeName;
-    }
-    struct BadgeToken {
-        string badgeName;
         uint256 badgeId;
+        uint256 pointId;
     }
 
     /** Storage */
     /// @custom:storage-location erc7201:BadgeV22.storage.BadgeStorage
     struct BadgeStorage {
         address _verifyAddress;
-        string[] badgeNames;
         //badgeId - eligiblePoint
         mapping(uint256 => uint256) eligiblePoints;
     }
@@ -76,7 +72,6 @@ contract BadgeV22 is
     );
     event BadgeSet(
         address indexed caller,
-        string badgeName,
         uint256 badgeId,
         uint256 eligiblePoint,
         uint256 timestamp
@@ -89,16 +84,16 @@ contract BadgeV22 is
     error NotSetmerkleRoot(bytes32 rootHash);
     error EmptyList();
     error InvalidMintPointData(MintPointData mintData);
-    error NotSetBadge(uint256 badgeId);
-    error NotEnoughPoint(address to, uint256 point, uint256 eligiblePoint);
-    error InvalidSetBadgeList(
+    error NotsetEligiblePointBadge(uint256 badgeId);
+    error NotEnoughPoint(
+        address to,
+        uint256 badgeId,
+        uint256 point,
+        uint256 eligiblePoint
+    );
+    error InvalidsetEligiblePointBadgeList(
         uint256 badgeNamesLength,
         uint256 eligiblePoinsLength
-    );
-    error InvalidTokenId(
-        BadgeType badgeType,
-        uint256 tokenId,
-        uint256 mintDataTokenId
     );
     error InvalidSigner(
         address signer,
@@ -126,7 +121,7 @@ contract BadgeV22 is
         _mintPoint(mintData);
         emit NFTMint(
             _msgSender(),
-            mintData.tokenId,
+            mintData.pointId,
             mintData.amount,
             mintData.to,
             BadgeType.POINT,
@@ -147,175 +142,83 @@ contract BadgeV22 is
     }
 
     function _mintPoint(MintPointData calldata mintData) internal {
-        (
-            bool signerMatch,
-            address signer,
-            address verifyAddress,
-            uint256 pointId
-        ) = _validateMintPoint(mintData);
-        if (pointId != mintData.tokenId || pointId == 0) {
-            revert InvalidTokenId(BadgeType.POINT, pointId, mintData.tokenId);
-        }
-        if (!signerMatch) {
-            revert InvalidSigner(signer, verifyAddress, mintData);
-        }
-        _mint(mintData.to, mintData.tokenId, mintData.amount, "");
+        _validateMintPoint(mintData);
+
+        _mint(mintData.to, mintData.pointId, mintData.amount, "");
     }
 
     function _mintBadge(
         MintBadgeData calldata mintData
     ) internal returns (uint256 _badgeId) {
-        uint256 badgeId = _genbadgeId(mintData.badgeName);
-        uint256 eligiblePoint = getEligiblePoint(mintData.badgeName);
+        uint256 eligiblePoint = getEligiblePoint(mintData.badgeId);
         if (eligiblePoint == 0) {
-            revert NotSetBadge(badgeId);
+            revert NotsetEligiblePointBadge(mintData.badgeId);
         }
-        uint256 pointId = _genPointId(mintData.badgeName);
-        uint256 point = balanceOf(mintData.to, pointId);
+        uint256 point = balanceOf(mintData.to, mintData.pointId);
         if (point < eligiblePoint) {
-            revert NotEnoughPoint(mintData.to, point, eligiblePoint);
+            revert NotEnoughPoint(
+                mintData.to,
+                mintData.badgeId,
+                point,
+                eligiblePoint
+            );
         }
-        _burn(mintData.to, pointId, eligiblePoint);
-        _mint(mintData.to, badgeId, 1, "");
-        return badgeId;
+        _burn(mintData.to, mintData.pointId, eligiblePoint);
+        _mint(mintData.to, mintData.badgeId, 1, "");
+        return mintData.badgeId;
     }
 
-    //-------------- setBadge --------------
-
-    function setBadge(
-        string calldata badgeName,
-        uint256 eligiblePoint
-    ) external onlyRole(BADGE_SETTER) {
-        _setBadge(badgeName, eligiblePoint);
-    }
-    function setBadges(
-        string[] calldata badgeNames,
-        uint256[] calldata eligiblePoins
-    ) external onlyRole(BADGE_SETTER) {
-        if (
-            badgeNames.length == 0 || badgeNames.length != eligiblePoins.length
-        ) {
-            revert InvalidSetBadgeList(badgeNames.length, eligiblePoins.length);
-        }
-        for (uint256 i = 0; i < badgeNames.length; i++) {
-            _setBadge(badgeNames[i], eligiblePoins[i]);
-        }
-    }
-    function _setBadge(
-        string calldata badgeName,
-        uint256 eligiblePoint
-    ) internal {
-        uint256 badgeId = _genbadgeId(badgeName);
-        BadgeStorage storage $ = _getBadgeStorage();
-        $.eligiblePoints[badgeId] = eligiblePoint;
-        $.badgeNames.push(badgeName);
-        emit BadgeSet(
-            _msgSender(),
-            badgeName,
-            badgeId,
-            eligiblePoint,
-            block.timestamp
-        );
-    }
-
-    function getBadgeNames() public view returns (string[] memory badgeNames) {
-        return _getBadgeStorage().badgeNames;
-    }
-
-    function getBadgeId(
-        string memory badgeName
-    ) external view returns (uint256) {
-        return _genbadgeId(badgeName);
-    }
-
-    function getPointId(
-        string memory badgeName
-    ) external view returns (uint256) {
-        return _genPointId(badgeName);
-    }
-
-    function getBadgeIds() external view returns (BadgeToken[] memory) {
-        string[] memory badgeNames = getBadgeNames();
-        BadgeToken[] memory badgeIds = new BadgeToken[](badgeNames.length);
-
-        for (uint256 i = 0; i < badgeNames.length; i++) {
-            badgeIds[i] = BadgeToken(badgeNames[i], _genbadgeId(badgeNames[i]));
-        }
-
-        return badgeIds;
-    }
-
-    function getEligiblePoint(
-        string calldata badgeName
-    ) public view returns (uint256) {
-        uint256 badgeId = _genbadgeId(badgeName);
+    function getEligiblePoint(uint256 badgeId) public view returns (uint256) {
         BadgeStorage storage $ = _getBadgeStorage();
         return $.eligiblePoints[badgeId];
     }
 
-    function _genbadgeId(
-        string memory badgeName
-    ) internal view returns (uint256) {
-        bytes memory nameHash10Bytes = stringToBytes(badgeName, 10);
-        bytes memory badgeID2bytes = stringToBytes("Badge", 2);
-        return
-            uint256(
-                bytes32(
-                    bytes.concat(
-                        nameHash10Bytes,
-                        badgeID2bytes,
-                        bytes20(address(this))
-                    )
-                )
-            );
-    }
-
-    function _genPointId(
-        string memory badgeName
-    ) internal view returns (uint256) {
-        bytes memory nameHash10Bytes = stringToBytes(badgeName, 10);
-        bytes memory pointId2bytes = stringToBytes("Point", 2);
-        return
-            uint256(
-                bytes32(
-                    bytes.concat(
-                        nameHash10Bytes,
-                        pointId2bytes,
-                        bytes20(address(this))
-                    )
-                )
-            );
-    }
-
     function _validateMintPoint(
         MintPointData calldata mintData
-    )
-        internal
-        view
-        virtual
-        returns (
-            bool signerMatch,
-            address signer,
-            address verifyAddress,
-            uint256 pointId
-        )
-    {
-        uint256 _pointId = _genPointId(mintData.badgeName);
+    ) internal view virtual {
         address _verifyAddress = getVerifyAddress();
-        address recovered = _recoverSigner(mintData);
-
-        return (
-            recovered == _verifyAddress,
-            recovered,
-            _verifyAddress,
-            _pointId
-        );
+        address recovered = _recoverMintPointSigner(mintData);
+        if (recovered != _verifyAddress) {
+            revert InvalidSigner(recovered, _verifyAddress, mintData);
+        }
     }
+
+    //-------------- setEligiblePointBadge --------------
+
+    function setEligiblePointBadge(
+        uint256 badgeId,
+        uint256 eligiblePoint
+    ) external onlyRole(BADGE_SETTER) {
+        _setEligiblePointBadge(badgeId, eligiblePoint);
+    }
+    function setEligiblePointBadges(
+        uint256[] calldata badgeIds,
+        uint256[] calldata eligiblePoins
+    ) external onlyRole(BADGE_SETTER) {
+        if (badgeIds.length == 0 || badgeIds.length != eligiblePoins.length) {
+            revert InvalidsetEligiblePointBadgeList(
+                badgeIds.length,
+                eligiblePoins.length
+            );
+        }
+        for (uint256 i = 0; i < badgeIds.length; i++) {
+            _setEligiblePointBadge(badgeIds[i], eligiblePoins[i]);
+        }
+    }
+    function _setEligiblePointBadge(
+        uint256 badgeId,
+        uint256 eligiblePoint
+    ) internal {
+        BadgeStorage storage $ = _getBadgeStorage();
+        $.eligiblePoints[badgeId] = eligiblePoint;
+        emit BadgeSet(_msgSender(), badgeId, eligiblePoint, block.timestamp);
+    }
+
     function getVerifyAddress() internal view returns (address) {
         return _getBadgeStorage()._verifyAddress;
     }
 
-    function _recoverSigner(
+    function _recoverMintPointSigner(
         MintPointData calldata mintData
     ) internal view virtual returns (address recovered) {
         bytes32 digest = _hashTypedDataV4(
@@ -323,7 +226,7 @@ contract BadgeV22 is
                 abi.encode(
                     _MINT_POINT_DATA_TYPEHASH,
                     mintData.to,
-                    mintData.tokenId,
+                    mintData.pointId,
                     mintData.amount
                 )
             )
@@ -350,24 +253,6 @@ contract BadgeV22 is
         whenNotPaused
     {
         super._update(from, to, ids, values);
-    }
-
-    function stringToBytes(
-        string memory input,
-        uint256 length
-    ) public pure returns (bytes memory) {
-        bytes memory inputBytes = bytes(input);
-        bytes memory result = new bytes(length);
-        uint256 minLength = inputBytes.length < length
-            ? inputBytes.length
-            : length;
-
-        // Copy only the necessary bytes
-        for (uint256 i = 0; i < minLength; i++) {
-            result[i] = inputBytes[i];
-        }
-
-        return result;
     }
 
     // not tranferable

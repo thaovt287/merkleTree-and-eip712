@@ -1,227 +1,227 @@
 [
     {
         "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 113,
-        "nameBadge": "ARC Crew"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 81,
-        "nameBadge": "Connector"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 70,
-        "nameBadge": "Champion"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
         "point": 72,
-        "nameBadge": "Connoisseur"
+        "badgeName": "ARC Crew"
     },
     {
         "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 197,
-        "nameBadge": "Co-creator"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 82,
-        "nameBadge": "Champion+"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 34,
-        "nameBadge": "Connector+"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 34,
-        "nameBadge": "Connoisseur+"
-    },
-    {
-        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "point": 132,
-        "nameBadge": "Co-creator+"
-    },
-    {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 42,
-        "nameBadge": "ARC Crew"
-    },
-    {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
         "point": 58,
-        "nameBadge": "Connector"
+        "badgeName": "Connector"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 123,
-        "nameBadge": "Champion"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 56,
+        "badgeName": "Champion"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 41,
-        "nameBadge": "Connoisseur"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 22,
+        "badgeName": "Connoisseur"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 119,
-        "nameBadge": "Co-creator"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 61,
+        "badgeName": "Co-creator"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 90,
-        "nameBadge": "Champion+"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 148,
+        "badgeName": "Champion+"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 104,
-        "nameBadge": "Connector+"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 184,
+        "badgeName": "Connector+"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 137,
-        "nameBadge": "Connoisseur+"
-    },
-    {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 82,
-        "nameBadge": "Co-creator+"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 159,
-        "nameBadge": "ARC Crew"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 79,
-        "nameBadge": "Connector"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 164,
-        "nameBadge": "Champion"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 85,
-        "nameBadge": "Connoisseur"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 118,
-        "nameBadge": "Co-creator"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 186,
-        "nameBadge": "Champion+"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
         "point": 81,
-        "nameBadge": "Connector+"
+        "badgeName": "Connoisseur+"
     },
     {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 41,
-        "nameBadge": "Connoisseur+"
-    },
-    {
-        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "point": 129,
-        "nameBadge": "Co-creator+"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 97,
-        "nameBadge": "ARC Crew"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 119,
-        "nameBadge": "Connector"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 141,
-        "nameBadge": "Champion"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 112,
-        "nameBadge": "Connoisseur"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 84,
-        "nameBadge": "Co-creator"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 42,
-        "nameBadge": "Champion+"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 117,
-        "nameBadge": "Connector+"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 26,
-        "nameBadge": "Connoisseur+"
-    },
-    {
-        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "point": 178,
-        "nameBadge": "Co-creator+"
+        "to": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "point": 61,
+        "badgeName": "Co-creator+"
     },
     {
         "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 164,
-        "nameBadge": "ARC Crew"
+        "point": 129,
+        "badgeName": "ARC Crew"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 65,
+        "badgeName": "Connector"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 86,
+        "badgeName": "Champion"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 111,
+        "badgeName": "Connoisseur"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 50,
+        "badgeName": "Co-creator"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 73,
+        "badgeName": "Champion+"
+    },
+    {
+        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "point": 93,
+        "badgeName": "Connector+"
     },
     {
         "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
         "point": 114,
-        "nameBadge": "Connector"
+        "badgeName": "Connoisseur+"
     },
     {
         "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 101,
-        "nameBadge": "Champion"
+        "point": 174,
+        "badgeName": "Co-creator+"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 132,
-        "nameBadge": "Connoisseur"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 130,
+        "badgeName": "ARC Crew"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 167,
-        "nameBadge": "Co-creator"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 73,
+        "badgeName": "Connector"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 94,
-        "nameBadge": "Champion+"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 158,
+        "badgeName": "Champion"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 131,
-        "nameBadge": "Connector+"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 159,
+        "badgeName": "Connoisseur"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 151,
-        "nameBadge": "Connoisseur+"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 74,
+        "badgeName": "Co-creator"
     },
     {
-        "to": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-        "point": 82,
-        "nameBadge": "Co-creator+"
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 50,
+        "badgeName": "Champion+"
+    },
+    {
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 187,
+        "badgeName": "Connector+"
+    },
+    {
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 52,
+        "badgeName": "Connoisseur+"
+    },
+    {
+        "to": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "point": 61,
+        "badgeName": "Co-creator+"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 100,
+        "badgeName": "ARC Crew"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 183,
+        "badgeName": "Connector"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 53,
+        "badgeName": "Champion"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 47,
+        "badgeName": "Connoisseur"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 80,
+        "badgeName": "Co-creator"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 150,
+        "badgeName": "Champion+"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 29,
+        "badgeName": "Connector+"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 153,
+        "badgeName": "Connoisseur+"
+    },
+    {
+        "to": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "point": 39,
+        "badgeName": "Co-creator+"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 177,
+        "badgeName": "ARC Crew"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 120,
+        "badgeName": "Connector"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 152,
+        "badgeName": "Champion"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 181,
+        "badgeName": "Connoisseur"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 98,
+        "badgeName": "Co-creator"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 43,
+        "badgeName": "Champion+"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 69,
+        "badgeName": "Connector+"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 153,
+        "badgeName": "Connoisseur+"
+    },
+    {
+        "to": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "point": 164,
+        "badgeName": "Co-creator+"
     }
 ]
