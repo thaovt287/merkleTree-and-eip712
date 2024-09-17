@@ -120,10 +120,10 @@ module.exports = {
         // l2: "optimism",
         // L1Etherscan: `${process.env.ETHERSCAN_API_KEY}`,
         // L2Etherscan: `${process.env.OPSCAN_API_KEY}`,
-        // gasPrice: 3, //ETH
-        gasPrice: 0.001, //OPTIMISM https://dune.com/haddis3/optimism-fee-calculator 
-        // gasPrice: 0.1,  //BASE https://base.dex.guru/gastracker
-        // gasPrice: 0.01,  //ARB https://docs.arbitrum.io/how-arbitrum-works/gas-fees#:~:text=Gas%20Price%20Floor%E2%80%8B,and%200.01%20gwei%20on%20Nova).
+        gasPrice: 3, //ETH
+        // gasPrice: 0.001, //OPTIMISM https://dune.com/haddis3/optimism-fee-calculator
+        // gasPrice: 0.1, //BASE https://base.dex.guru/gastracker
+        // gasPrice: 0.01, //ARB https://docs.arbitrum.io/how-arbitrum-works/gas-fees#:~:text=Gas%20Price%20Floor%E2%80%8B,and%200.01%20gwei%20on%20Nova).
         currencyDisplayPrecision: 5,
         includeIntrinsicGas: true,
         proxyResolver: new OZResolver(),
